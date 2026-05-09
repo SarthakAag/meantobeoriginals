@@ -1,60 +1,116 @@
-import Link from "next/link";
-
-const links = [
-  { name: "Services", href: "#services" },
-  { name: "Case Studies", href: "#cases" },
-  { name: "Framework", href: "#framework" },
-  { name: "Contact", href: "#contact" },
-];
+"use client";
 
 export default function Footer() {
   return (
-    <footer className="px-6 pb-10 pt-24 lg:px-12">
-      <div className="mx-auto max-w-7xl rounded-[3rem] border border-[#e8dfd5] bg-white/70 px-8 py-10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] backdrop-blur-xl">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between">
-          {/* Brand */}
-          <div>
-            <div className="flex items-center gap-4">
-              <h2 className="text-3xl font-black tracking-tight text-black">
-                MTO
-              </h2>
+    <>
+      <style>{`
+        .footer {
+          border-top: 1px solid rgba(201,145,61,0.2);
+          padding: 2.5rem 2rem;
+          background: linear-gradient(to bottom, transparent, rgba(245,233,211,0.18));
+        }
 
-              <div className="h-8 w-px bg-neutral-300" />
+        .footer-inner {
+          max-width: 1120px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
 
-              <span className="text-xs font-semibold uppercase tracking-[0.35em] text-[#a31414]">
-                Originals
-              </span>
-            </div>
+        .footer-brand {
+          font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+          font-size: 17px;
+          font-weight: 700;
+          color: #1A0F07;
+          letter-spacing: -0.01em;
+          white-space: nowrap;
+        }
 
-            <p className="mt-6 max-w-md text-base leading-7 text-neutral-600">
-              Building high-converting brands, campaigns, and digital
-              experiences designed for modern business growth.
-            </p>
-          </div>
+        .footer-brand span {
+          color: #C9913D;
+          margin-right: 6px;
+        }
 
-          {/* Nav */}
-          <div className="flex flex-wrap gap-6">
-            {links.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="text-sm font-semibold uppercase tracking-[0.18em] text-neutral-700 transition hover:text-[#b11212]"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-        </div>
+        .footer-copy {
+          font-family: 'Outfit', 'DM Sans', sans-serif;
+          font-size: 12px;
+          font-weight: 300;
+          color: rgba(80,50,30,0.45);
+          margin: 0;
+          text-align: center;
+          flex: 1;
+        }
 
-        {/* Bottom */}
-        <div className="mt-10 flex flex-col gap-4 border-t border-[#ebe2d8] pt-8 text-sm text-neutral-500 md:flex-row md:items-center md:justify-between">
-          <p>© 2025 MTO Originals. All rights reserved.</p>
+        .footer-nav {
+          display: flex;
+          gap: 1.75rem;
+          align-items: center;
+        }
 
-          <p>
-            Branding · Leads · Conversions · Growth · Web Dev
+        .footer-nav a {
+          font-family: 'Outfit', 'DM Sans', sans-serif;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: rgba(80,50,30,0.4);
+          text-decoration: none;
+          transition: color 0.2s;
+          white-space: nowrap;
+        }
+
+        .footer-nav a:hover { color: #B83A2F; }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 680px) {
+          .footer-inner {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.1rem;
+          }
+
+          .footer-copy {
+            order: 3;
+            flex: unset;
+          }
+
+          .footer-nav {
+            gap: 1.5rem;
+          }
+        }
+
+        @media (max-width: 360px) {
+          .footer-nav {
+            gap: 1rem;
+          }
+
+          .footer-nav a {
+            font-size: 11px;
+          }
+        }
+      `}</style>
+
+      <footer className="footer">
+        <div className="footer-inner">
+          <span className="footer-brand">
+            <span>✦</span>Meant to Be Originals
+          </span>
+
+          <p className="footer-copy">
+            © {new Date().getFullYear()} Meant to Be Originals. Made with ❤️
           </p>
+
+          <nav className="footer-nav">
+            {["Home", "Services", "Contact"].map(link => (
+              <a key={link} href={`#${link.toLowerCase()}`}>{link}</a>
+            ))}
+          </nav>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }

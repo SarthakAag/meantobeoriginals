@@ -1,9 +1,39 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 html {
   scroll-behavior: smooth;
 }
 
 body {
-  background: #f8f4ee;
+  min-height: 100vh;
+  background-color: #ffffff;
+  background-image:
+    radial-gradient(ellipse 70% 55% at 85% 10%, rgba(230, 210, 185, 0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 10% 45%, rgba(240, 220, 200, 0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 80% 45% at 55% 90%, rgba(225, 205, 175, 0.40) 0%, transparent 70%),
+    radial-gradient(ellipse 45% 40% at 90% 60%, rgba(245, 225, 205, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 248, 240, 0.60) 0%, transparent 80%);
+  color: #2a1a0e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f5ede0; }
+::-webkit-scrollbar-thumb { background: rgba(192,57,43,0.25); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(192,57,43,0.45); }
+
+::selection { background: rgba(192,57,43,0.15); color: #2a1a0e; }
+
+input::placeholder, textarea::placeholder { color: rgba(90,60,40,0.3); }
