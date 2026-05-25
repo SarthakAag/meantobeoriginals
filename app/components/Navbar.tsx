@@ -107,26 +107,31 @@ export default function Navbar() {
               type: "spring",
               stiffness: 300,
             }}
-            style={{
-              width: scrolled ? "46px" : "52px",
-              height: scrolled ? "46px" : "52px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              position: "relative",
-              flexShrink: 0,
-              background: "transparent",
+style={{
+  width: scrolled ? "58px" : "66px",
 
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+  height: scrolled ? "58px" : "66px",
 
-              transition: "all 0.3s ease",
+  overflow: "hidden",
 
-              boxShadow: `
-                0 0 18px rgba(192,57,43,0.18),
-                0 0 40px rgba(192,57,43,0.12)
-              `,
-            }}
+  position: "relative",
+
+  flexShrink: 0,
+
+  background: "transparent",
+
+  display: "flex",
+
+  alignItems: "center",
+
+  justifyContent: "center",
+
+  transition: "all 0.3s ease",
+
+  marginTop: scrolled ? "8px" : "14px",
+
+  boxShadow: "none",
+}}
           >
             <Image
               src="/logo1.png"

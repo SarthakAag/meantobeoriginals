@@ -217,7 +217,9 @@ function PhotoFrame() {
       <div
         className="about-photo-frame"
         style={{
-          aspectRatio: "4/5",
+          aspectRatio: "1/1",
+          maxWidth: "520px",
+          margin: "0 auto",
           borderRadius: "22px",
           
           border: "1px solid rgba(210,185,155,0.5)",
