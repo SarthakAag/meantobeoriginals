@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useAnimation, type Variants } from "framer-motion";
+import Image from "next/image";
 
 /* ─── Global styles ─────────────────────────────────────────── */
 const globalStyles = `
@@ -127,7 +128,8 @@ function SectionLabel({ text }: { text: string }) {
       />
       <span style={{
         fontFamily: "'DM Sans', sans-serif", fontSize: "11px",
-        color: "rgba(80,50,30,0.55)", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500,
+        color: "rgba(80,50,30,0.55)", letterSpacing: "0.14em",
+        textTransform: "uppercase", fontWeight: 500,
       }}>{text}</span>
       <span style={{
         width: 5, height: 5, borderRadius: "50%", background: "#C0392B",
@@ -149,7 +151,6 @@ function AccentCard() {
       whileHover={{ scale: 1.07, rotate: 0 }}
       style={{
         position: "absolute", bottom: "-20px", right: "-20px",
-        /* Transparent red glass box */
         background: "rgba(192,57,43,0.12)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
@@ -158,7 +159,6 @@ function AccentCard() {
         boxShadow: "0 8px 40px rgba(192,57,43,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
         animation: "float-card 4s ease-in-out infinite",
         cursor: "default", zIndex: 2,
-        /* Glowing ring on hover via CSS class below */
       }}
     >
       {/* Inner glow strip */}
@@ -168,7 +168,6 @@ function AccentCard() {
         borderRadius: 1,
       }} />
 
-      {/* Content */}
       <p style={{
         fontFamily: "'Playfair Display', Georgia, serif",
         fontSize: "38px", fontWeight: 800, color: "#C0392B",
@@ -182,7 +181,7 @@ function AccentCard() {
       }}>Dreamers &<br />Creators</p>
 
       {/* Decorative corner dots */}
-      {[["4px","4px"], ["4px","auto"], ["auto","4px"], ["auto","auto"]].map(([t,r], i) => (
+      {[["4px","4px"], ["4px","auto"], ["auto","4px"], ["auto","auto"]].map(([t, r], i) => (
         <div key={i} style={{
           position: "absolute",
           top: t !== "auto" ? t : undefined, bottom: t === "auto" ? "4px" : undefined,
@@ -195,7 +194,7 @@ function AccentCard() {
   );
 }
 
-/* ─── Photo placeholder frame ───────────────────────────────── */
+/* ─── Photo frame with real image ───────────────────────────── */
 function PhotoFrame() {
   return (
     <motion.div
@@ -218,43 +217,44 @@ function PhotoFrame() {
       <div
         className="about-photo-frame"
         style={{
-          aspectRatio: "4/5", borderRadius: "22px",
-          background: "linear-gradient(145deg, rgba(255,248,238,0.7) 0%, rgba(245,230,210,0.5) 100%)",
+          aspectRatio: "4/5",
+          borderRadius: "22px",
+          
           border: "1px solid rgba(210,185,155,0.5)",
-          backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)",
-          overflow: "hidden", position: "relative",
-          display: "flex", alignItems: "center", justifyContent: "center",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          overflow: "hidden",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           boxShadow: "0 16px 60px rgba(150,100,60,0.12), inset 0 1px 0 rgba(255,255,255,0.5)",
         }}
       >
-        {/* Scan line */}
+        {/* Your photo */}
+        <Image
+          src="/images/about.jpg"
+          alt="Aryan & Shruthi"
+          fill
+          priority
+          style={{ objectFit: "cover", objectPosition: "40% center", zIndex: 1 }}
+        />
+
+        {/* Scan line — sits above image */}
         <div style={{
           position: "absolute", left: 0, right: 0, height: "60px",
-          background: "linear-gradient(to bottom, transparent, rgba(192,57,43,0.05), transparent)",
-          animation: "scan 4s linear infinite", pointerEvents: "none", zIndex: 1,
+          
+          animation: "scan 4s linear infinite", pointerEvents: "none", zIndex: 2,
         }} />
 
-        {/* Shimmer on hover */}
+        {/* Shimmer on hover — sits above image */}
         <div className="about-photo-shimmer" style={{
-          position: "absolute", inset: 0, zIndex: 2,
-          background: "linear-gradient(105deg, transparent 30%, rgba(255,220,180,0.25) 50%, transparent 70%)",
+          position: "absolute", inset: 0, zIndex: 3,
+          
           transform: "translateX(-100%)",
         }} />
 
-        {/* Placeholder */}
-        <div style={{ textAlign: "center", padding: "2rem", position: "relative", zIndex: 3 }}>
-          <motion.div
-            animate={{ scale: [1, 1.08, 1], opacity: [0.35, 0.5, 0.35] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            style={{ fontSize: "60px", marginBottom: "1rem" }}
-          >📸</motion.div>
-          <p style={{
-            fontFamily: "'DM Sans', sans-serif", fontSize: "11px",
-            color: "rgba(80,50,30,0.35)", letterSpacing: "0.12em", textTransform: "uppercase",
-          }}>Your photo here</p>
-        </div>
-
-        {/* Grid overlay */}
+        {/* Subtle grid overlay */}
         <div style={{
           position: "absolute", inset: 0, zIndex: 0, opacity: 0.04,
           backgroundImage: "linear-gradient(rgba(80,40,20,1) 1px, transparent 1px), linear-gradient(90deg, rgba(80,40,20,1) 1px, transparent 1px)",
@@ -282,7 +282,6 @@ function QuoteBlock({ text }: { text: string }) {
       whileHover={{ x: 4 }}
       className="about-quote"
       style={{
-        /* Transparent red glass quote box */
         background: "rgba(192,57,43,0.07)",
         backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
         border: "1px solid rgba(192,57,43,0.2)",
@@ -331,7 +330,10 @@ export default function About() {
 
   const fadeUp: Variants = {
     hidden: { opacity: 0, y: 28 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as [number,number,number,number] } },
+    visible: {
+      opacity: 1, y: 0,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+    },
   };
 
   return (
@@ -362,7 +364,12 @@ export default function About() {
         <div style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div
             className="about-grid"
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6rem", alignItems: "center" }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "6rem",
+              alignItems: "center",
+            }}
           >
             {/* LEFT — photo */}
             <PhotoFrame />
@@ -378,7 +385,6 @@ export default function About() {
                 <SectionLabel text="About Us" />
               </motion.div>
 
-              {/* Headline with writing effect */}
               <motion.h2
                 variants={fadeUp}
                 style={{
@@ -397,35 +403,34 @@ export default function About() {
                 </motion.em>
               </motion.h2>
 
-              {/* Paragraph 1 — typewriter */}
               <motion.div variants={fadeUp}>
                 <TypewriterText
                   text={p1}
                   speed={14}
                   delay={200}
                   style={{
-                    fontFamily: "'DM Sans', sans-serif", fontSize: "clamp(14px, 1.5vw, 16px)",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "clamp(14px, 1.5vw, 16px)",
                     color: "rgba(50,30,15,0.65)", lineHeight: 1.85,
                     margin: "0 0 1.25rem", fontWeight: 300,
                   }}
                 />
               </motion.div>
 
-              {/* Paragraph 2 — typewriter (offset delay) */}
               <motion.div variants={fadeUp}>
                 <TypewriterText
                   text={p2}
                   speed={14}
                   delay={p1.length * 14 + 400}
                   style={{
-                    fontFamily: "'DM Sans', sans-serif", fontSize: "clamp(14px, 1.5vw, 16px)",
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: "clamp(14px, 1.5vw, 16px)",
                     color: "rgba(50,30,15,0.65)", lineHeight: 1.85,
                     margin: "0 0 2rem", fontWeight: 300,
                   }}
                 />
               </motion.div>
 
-              {/* Glass red quote block */}
               <motion.div variants={fadeUp}>
                 <QuoteBlock text="This is more than just a business — it's our passion, our dream, and a journey we're excited to share with you." />
               </motion.div>
@@ -448,7 +453,8 @@ export default function About() {
                   }}>Aryan & Shruthi</p>
                   <p style={{
                     fontFamily: "'DM Sans', sans-serif", fontSize: "11px",
-                    color: "rgba(80,50,30,0.45)", margin: 0, letterSpacing: "0.1em", textTransform: "uppercase",
+                    color: "rgba(80,50,30,0.45)", margin: 0,
+                    letterSpacing: "0.1em", textTransform: "uppercase",
                   }}>Founders, with love</p>
                 </div>
               </motion.div>

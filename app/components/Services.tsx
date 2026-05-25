@@ -1,446 +1,612 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import Image from "next/image";
 
-/* ─── Data ──────────────────────────────────────────────────── */
 const SERVICES = [
   {
-    icon: "📣", title: "Performance Marketing",
-    tagline: "Grow, connect and stand out in the digital world",
-    items: ["Campaigns Creation", "Strategy & Planning", "CPL and ROAS Tracking", "Meta Ads Handling"],
-    accentDelay: 0,
-  },
-  {
-    icon: "🎁", title: "Hampers",
+    image: "/images/hampers.jpg",
+    title: "Hampers",
     tagline: "Made to Make Moments Memorable",
-    items: ["Wellness Hampers", "Lifestyle Hampers", "Personalised Hampers", "Pet Hampers", "Return Gifts & More"],
-    accentDelay: 0.08,
+    desc: "Thoughtfully curated hampers for every occasion — from wellness to celebrations.",
+    items: [
+      "Wellness Hampers",
+      "Lifestyle Hampers",
+      "Personalised Hampers",
+      "Pet Hampers",
+      "Return Gifts & More",
+    ],
+    delay: 0,
   },
   {
-    icon: "📱", title: "Social Media Management",
+    image: "/images/marketing.jpg",
+    title: "Performance Marketing",
+    tagline: "Grow, connect & stand out",
+    desc: "Data-driven campaigns that maximise reach, leads and return on ad spend.",
+    items: [
+      "Campaigns Creation",
+      "Strategy & Planning",
+      "CPL & ROAS Tracking",
+      "Meta Ads Handling",
+    ],
+    delay: 0.1,
+  },
+  {
+    image: "/images/social.jpg",
+    title: "Social Media Management",
     tagline: "Where Creativity Meets Connection",
-    items: ["Scripting with CTA", "High Quality Video Shoot", "Editing", "SEO & Keyword Research", "Content Planning"],
-    accentDelay: 0.16,
+    desc: "End-to-end social presence — from scripting to posting, we handle it all.",
+    items: [
+      "Scripting with CTA",
+      "High Quality Video Shoot",
+      "Editing",
+      "SEO & Keywords",
+      "Content Planning",
+    ],
+    delay: 0.2,
   },
   {
-    icon: "🎉", title: "Event Management",
+    image: "/images/events.jpg",
+    title: "Event Management",
     tagline: "Where Celebrations Come to Life",
-    items: ["Weddings & Receptions", "Birthday Celebrations", "Baby & Naming Ceremonies", "Corporate Events", "Surprise Occasions"],
-    accentDelay: 0.24,
+    desc: "From intimate ceremonies to grand corporate events — flawlessly executed.",
+    items: [
+      "Weddings & Receptions",
+      "Birthday Celebrations",
+      "Baby & Naming Ceremonies",
+      "Corporate Events",
+      "Surprise Occasions",
+    ],
+    delay: 0.3,
   },
   {
-    icon: "✦", title: "Branding",
+    image: "/images/branding.jpg",
+    title: "Branding",
     tagline: "Your Brand's Creative Partner",
-    items: ["Brand Identity Design", "Social Media Content", "Creative Marketing", "Packaging & Visual Design", "Digital Branding"],
-    accentDelay: 0.32,
+    desc: "Visual identity and storytelling that makes your brand impossible to ignore.",
+    items: [
+      "Brand Identity Design",
+      "Social Media Content",
+      "Packaging Design",
+      "Digital Branding",
+    ],
+    delay: 0.4,
   },
   {
-    icon: "💻", title: "Software Development",
+    image: "/images/software.jpg",
+    title: "Software Development",
     tagline: "Smart Solutions, Seamless Experiences",
-    items: ["Landing Pages", "E-commerce Websites", "CRM Systems", "ERP Solutions", "Custom Applications"],
-    accentDelay: 0.4,
+    desc: "Custom-built digital products that work beautifully for your business.",
+    items: [
+      "Landing Pages",
+      "E-commerce Websites",
+      "CRM Systems",
+      "ERP Solutions",
+      "Custom Applications",
+    ],
+    delay: 0.5,
   },
 ];
 
-/* ─── Design tokens — red & white-cream ─────────────────────── */
-const T = {
-  bg:          "linear-gradient(145deg, #fff8f6 0%, #fff2ee 35%, #ffe8e2 65%, #fff5f3 100%)",
-  blobA:       "rgba(192,57,43,0.18)",
-  blobB:       "rgba(220,80,60,0.12)",
-  blobC:       "rgba(255,180,160,0.22)",
-  cardRest:    "rgba(255,255,255,0.45)",
-  cardHover:   "rgba(255,255,255,0.72)",
-  borderRest:  "rgba(192,57,43,0.15)",
-  borderHover: "rgba(192,57,43,0.38)",
-  shadow:      "rgba(192,57,43,0.1)",
-  shadowHover: "rgba(192,57,43,0.22)",
-  red:         "#C0392B",
-  redDark:     "#9B2D1F",
-  redGlass:    "rgba(192,57,43,0.12)",
-  redBorder:   "rgba(192,57,43,0.32)",
-  textH:       "#2a0c06",
-  textB:       "rgba(55,16,8,0.7)",
-  textMuted:   "rgba(120,40,25,0.55)",
-};
-
-/* ─── Global styles ─────────────────────────────────────────── */
 const globalStyles = `
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=DM+Sans:wght@300;400;500;600&display=swap');
-  *, *::before, *::after { box-sizing: border-box; }
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap');
 
-  @keyframes blink-dot {
-    0%,100% { opacity:1; } 50% { opacity:0.12; }
-  }
   @keyframes blob-drift {
-    0%,100% { transform:translate(0,0) scale(1); }
-    33% { transform:translate(24px,-16px) scale(1.06); }
-    66% { transform:translate(-16px,12px) scale(0.96); }
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(20px,-14px) scale(1.05); }
+    66% { transform: translate(-14px,10px) scale(0.97); }
   }
-  @keyframes noise {
-    0%,100%{transform:translate(0,0);}10%{transform:translate(-2%,-3%);}
-    30%{transform:translate(3%,2%);}50%{transform:translate(-1%,4%);}
-    70%{transform:translate(2%,-2%);}90%{transform:translate(-3%,1%);}
-  }
-  @keyframes shimmer-sweep {
-    0%   { transform: translateX(-100%) skewX(-12deg); opacity:0; }
-    10%  { opacity:1; }
-    100% { transform: translateX(280%)  skewX(-12deg); opacity:0; }
-  }
-  @keyframes icon-pop {
-    0%,100% { transform: scale(1) rotate(0deg); }
-    50%     { transform: scale(1.13) rotate(-5deg); }
-  }
+
   @keyframes pulse-ring {
-    0%   { box-shadow: 0 0 0 0 rgba(192,57,43,0.45); }
-    70%  { box-shadow: 0 0 0 8px rgba(192,57,43,0); }
+    0% { box-shadow: 0 0 0 0 rgba(192,57,43,0.4); }
+    70% { box-shadow: 0 0 0 7px rgba(192,57,43,0); }
     100% { box-shadow: 0 0 0 0 rgba(192,57,43,0); }
   }
-  @keyframes float-badge {
-    0%,100% { transform: translateY(0px); }
-    50%     { transform: translateY(-5px); }
-  }
-  @keyframes glow-breathe {
-    0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.0), 0 6px 28px rgba(192,57,43,0.1); }
-    50%     { box-shadow: 0 0 24px 4px rgba(192,57,43,0.12), 0 6px 28px rgba(192,57,43,0.1); }
+
+  .services-section {
+    overflow: hidden;
   }
 
-  @media (max-width: 1024px) { .srv-grid { grid-template-columns: repeat(2,1fr) !important; } }
-  @media (max-width: 620px)  { .srv-grid { grid-template-columns: 1fr !important; gap: 1rem !important; } }
-  @media (max-width: 900px)  { .srv-section { padding: 80px 1.5rem !important; } }
-  @media (max-width: 480px)  { .srv-section { padding: 60px 1rem !important; } }
+  @media (max-width: 768px) {
+    .srow-wrap {
+      flex-direction: column !important;
+      gap: 2rem !important;
+    }
+
+    .srow-wrap.reverse {
+      flex-direction: column !important;
+    }
+
+    .box-side {
+      width: 100% !important;
+      padding-top: 70px !important;
+    }
+
+    .content-side {
+      width: 100% !important;
+      padding: 0 !important;
+      align-items: flex-start !important;
+      text-align: left !important;
+      margin-top: 1rem;
+    }
+
+    .chips-wrap {
+      justify-content: flex-start !important;
+    }
+
+    .divider-line {
+      margin-left: 0 !important;
+    }
+
+    .services-container {
+      gap: 90px !important;
+    }
+
+    .service-image {
+      width: 160px !important;
+      height: 170px !important;
+      left: 50% !important;
+      right: auto !important;
+      transform: translateX(-50%) !important;
+    }
+
+    .service-card {
+      height: auto !important;
+      min-height: 130px !important;
+      padding: 100px 20px 20px !important;
+      text-align: center !important;
+      justify-content: center !important;
+    }
+
+    .service-title {
+      font-size: 24px !important;
+    }
+
+    .service-tagline {
+      font-size: 14px !important;
+    }
+
+    .service-description {
+      font-size: 15px !important;
+      line-height: 1.8 !important;
+    }
+
+    .chips-wrap span {
+      font-size: 12px !important;
+      padding: 5px 12px !important;
+    }
+
+    .section-heading {
+      font-size: clamp(34px, 9vw, 50px) !important;
+    }
+
+    .section-subtitle {
+      font-size: 16px !important;
+      padding: 0 10px;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .services-section {
+      padding: 80px 20px 60px !important;
+    }
+
+    .services-container {
+      gap: 75px !important;
+    }
+
+    .service-image {
+      width: 140px !important;
+      height: 150px !important;
+    }
+
+    .service-card {
+      padding: 90px 16px 18px !important;
+      border-radius: 20px !important;
+    }
+
+    .service-title {
+      font-size: 21px !important;
+    }
+
+    .service-tagline {
+      font-size: 12px !important;
+    }
+
+    .service-description {
+      font-size: 14px !important;
+    }
+  }
 `;
 
-/* ─── Service Card ──────────────────────────────────────────── */
-function ServiceCard({ service, index }: { service: typeof SERVICES[0]; index: number }) {
-  const [hovered, setHovered] = useState(false);
-  const ref    = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
+function ServiceRow({
+  service,
+  index,
+}: {
+  service: typeof SERVICES[0];
+  index: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const inView = useInView(ref, {
+    once: true,
+    margin: "-60px",
+  });
+
+  const isReversed = index % 2 !== 0;
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{
-        duration: 0.65,
-        delay: service.accentDelay,
-        ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        position: "relative", overflow: "hidden",
-        borderRadius: 22, padding: "2rem",
-        cursor: "default",
-        /* White-cream frosted glass */
-        background: hovered ? T.cardHover : T.cardRest,
-        backdropFilter: "blur(30px)",
-        WebkitBackdropFilter: "blur(30px)",
-        border: `1px solid ${hovered ? T.borderHover : T.borderRest}`,
-        boxShadow: hovered
-          ? `0 20px 60px ${T.shadowHover}, inset 0 1px 0 rgba(255,255,255,0.85)`
-          : `0 6px 28px ${T.shadow}, inset 0 1px 0 rgba(255,255,255,0.7)`,
-        transform: hovered ? "translateY(-8px)" : "translateY(0)",
-        transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
-        animation: hovered ? "glow-breathe 2s ease-in-out infinite" : "none",
-      }}
-    >
-      {/* Shimmer sweep on hover */}
-      {hovered && (
-        <div style={{
-          position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-          background: "linear-gradient(105deg, transparent 28%, rgba(255,220,210,0.35) 50%, transparent 72%)",
-          animation: "shimmer-sweep 0.85s ease forwards",
-        }} />
-      )}
-
-      {/* ── RED top-bar accent ───────────────────────────────── */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0,
-        height: hovered ? 3 : 2,
-        background: hovered
-          ? `linear-gradient(90deg, ${T.red}, #e05040, ${T.red})`
-          : `linear-gradient(90deg, rgba(192,57,43,0.3), rgba(192,57,43,0.08))`,
-        transform: hovered ? "scaleX(1)" : "scaleX(0.35)",
-        transformOrigin: "left",
-        transition: "all 0.4s cubic-bezier(0.22,1,0.36,1)",
-        borderRadius: "22px 22px 0 0",
-      }} />
-
-      {/* Red corner radial glow */}
-      <div style={{
-        position: "absolute", top: -28, right: -28,
-        width: 100, height: 100, borderRadius: "50%",
-        background: `radial-gradient(circle, rgba(192,57,43,0.15) 0%, transparent 70%)`,
-        filter: "blur(14px)", pointerEvents: "none",
-        opacity: hovered ? 1 : 0.3, transition: "opacity 0.35s",
-      }} />
-      <div style={{
-        position: "absolute", bottom: -20, left: -20,
-        width: 80, height: 80, borderRadius: "50%",
-        background: `radial-gradient(circle, rgba(192,57,43,0.08) 0%, transparent 70%)`,
-        filter: "blur(12px)", pointerEvents: "none",
-        opacity: hovered ? 1 : 0, transition: "opacity 0.4s",
-      }} />
-
-      {/* ── Icon box — transparent red glass ────────────────── */}
-      <div style={{
-        width: 52, height: 52, borderRadius: 14, marginBottom: "1.25rem",
-        background: hovered ? T.redGlass : "rgba(255,235,230,0.6)",
-        backdropFilter: "blur(12px)",
-        border: `1px solid ${hovered ? T.redBorder : "rgba(192,57,43,0.18)"}`,
-        boxShadow: hovered
-          ? `0 4px 20px rgba(192,57,43,0.18), inset 0 1px 0 rgba(255,210,200,0.5)`
-          : `inset 0 1px 0 rgba(255,255,255,0.8)`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 22, transition: "all 0.35s cubic-bezier(0.22,1,0.36,1)",
-        animation: hovered ? "icon-pop 1.6s ease-in-out infinite" : "none",
-        position: "relative", zIndex: 1,
-      }}>{service.icon}</div>
-
-      {/* Title */}
-      <h3 style={{
-        fontFamily: "'Playfair Display', Georgia, serif",
-        fontSize: 19, fontWeight: 700, color: T.textH,
-        margin: "0 0 0.35rem", lineHeight: 1.2,
-        transition: "color 0.25s", position: "relative", zIndex: 1,
-      }}>{service.title}</h3>
-
-      {/* Tagline */}
-      <p style={{
-        fontFamily: "'DM Sans', sans-serif", fontSize: 12.5,
-        color: hovered ? T.textMuted : "rgba(140,50,30,0.48)",
-        margin: "0 0 1.1rem", lineHeight: 1.5, fontStyle: "italic",
-        transition: "color 0.25s", position: "relative", zIndex: 1,
-      }}>{service.tagline}</p>
-
-      {/* Divider — red on hover */}
-      <div style={{
-        height: 1, marginBottom: "1rem",
-        background: hovered
-          ? `linear-gradient(90deg, rgba(192,57,43,0.5), rgba(192,57,43,0.06))`
-          : `linear-gradient(90deg, rgba(192,57,43,0.15), transparent)`,
-        transition: "background 0.3s",
-        position: "relative", zIndex: 1,
-      }} />
-
-      {/* Items list */}
-      <ul style={{ listStyle: "none", padding: 0, margin: 0, position: "relative", zIndex: 1 }}>
-        {service.items.map((item, j) => (
-          <motion.li
-            key={item}
-            initial={{ opacity: 0, x: -10 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.4, delay: service.accentDelay + 0.18 + j * 0.065 }}
+    <div ref={ref}>
+      <div
+        className={`srow-wrap ${
+          isReversed ? "reverse" : ""
+        }`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          flexDirection: isReversed
+            ? "row-reverse"
+            : "row",
+        }}
+      >
+        {/* LEFT SIDE */}
+        <div
+          className="box-side"
+          style={{
+            flex: "0 0 52%",
+            position: "relative",
+            paddingTop: 83,
+          }}
+        >
+          {/* IMAGE */}
+          <motion.div
+            className="service-image"
+            animate={
+              inView
+                ? { y: 0, opacity: 1 }
+                : { y: 20, opacity: 0 }
+            }
+            transition={{
+              duration: 0.6,
+              delay: service.delay + 0.1,
+            }}
+            whileHover={{
+              y: -10,
+              scale: 1.03,
+            }}
             style={{
-              display: "flex", alignItems: "center", gap: 9,
-              fontFamily: "'DM Sans', sans-serif", fontSize: 13.5,
-              color: hovered ? T.textB : "rgba(60,20,10,0.68)",
-              padding: "5.5px 0",
-              borderBottom: "1px solid rgba(192,57,43,0.08)",
-              transition: "color 0.2s",
+              position: "absolute",
+              top: 0,
+              left: isReversed ? "auto" : 18,
+              right: isReversed ? 18 : "auto",
+              width: 190,
+              height: 200,
+              zIndex: 20,
+              borderRadius: 18,
+              overflow: "hidden",
             }}
           >
-            {/* Transparent red bullet chip */}
-            <span style={{
-              width: 18, height: 18, borderRadius: 6, flexShrink: 0,
-              background: hovered ? "rgba(192,57,43,0.15)" : "rgba(192,57,43,0.07)",
-              border: `1px solid rgba(192,57,43,${hovered ? 0.35 : 0.2})`,
-              backdropFilter: "blur(6px)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              transition: "all 0.25s",
-            }}>
-              <span style={{ color: T.red, fontSize: 8 }}>▸</span>
-            </span>
-            {item}
-          </motion.li>
-        ))}
-      </ul>
+            <Image
+              src={service.image}
+              alt={service.title}
+              fill
+              style={{
+                objectFit: "cover",
+              }}
+            />
+          </motion.div>
 
-      {/* ── Transparent red glass "Available" pill ───────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 6 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ delay: service.accentDelay + 0.55 }}
-        style={{
-          marginTop: "1.5rem",
-          display: "inline-flex", alignItems: "center", gap: 7,
-          background: T.redGlass,
-          backdropFilter: "blur(12px)",
-          border: `1px solid ${T.redBorder}`,
-          borderRadius: 100, padding: "5px 14px",
-          boxShadow: "inset 0 1px 0 rgba(255,220,215,0.45), 0 2px 10px rgba(192,57,43,0.1)",
-          position: "relative", zIndex: 1,
-        }}
-      >
-        <span style={{
-          width: 6, height: 6, borderRadius: "50%",
-          background: T.red, display: "inline-block",
-          animation: "pulse-ring 2s ease-out infinite",
-        }} />
-        <span style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: 10,
-          color: T.redDark, letterSpacing: "0.1em",
-          textTransform: "uppercase", fontWeight: 600,
-        }}>Available</span>
-      </motion.div>
-    </motion.div>
+          {/* CARD */}
+          <motion.div
+            className="service-card"
+            animate={
+              inView
+                ? { opacity: 1, y: 0 }
+                : { opacity: 0, y: 20 }
+            }
+            transition={{
+              duration: 0.6,
+              delay: service.delay,
+            }}
+            whileHover={{
+              y: -4,
+              boxShadow:
+                "0 20px 60px rgba(192,57,43,0.16)",
+            }}
+            style={{
+              background: "rgba(255,255,255,0.35)",
+              backdropFilter: "blur(28px)",
+              border:
+                "1px solid rgba(255,255,255,0.65)",
+              borderRadius: 24,
+              height: 125,
+              display: "flex",
+              alignItems: "center",
+              paddingLeft: isReversed ? 24 : 210,
+              paddingRight: isReversed ? 210 : 24,
+              boxShadow:
+                "0 8px 36px rgba(192,57,43,0.1)",
+              position: "relative",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 3,
+                background:
+                  "linear-gradient(90deg, #C0392B, rgba(192,57,43,0.08))",
+                borderRadius: "24px 24px 0 0",
+                opacity: 0.55,
+              }}
+            />
+
+            <div>
+              <h3
+                className="service-title"
+                style={{
+                  fontFamily:
+                    "'Playfair Display', serif",
+                  fontSize: 24,
+                  fontWeight: 800,
+                  color: "#2a0c06",
+                  lineHeight: 1.2,
+                  margin: 0,
+                }}
+              >
+                {service.title}
+              </h3>
+
+              <p
+                className="service-tagline"
+                style={{
+                  fontFamily:
+                    "'DM Sans', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "rgba(130,50,20,0.6)",
+                  fontStyle: "italic",
+                  margin: "6px 0 0",
+                }}
+              >
+                {service.tagline}
+              </p>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* CONTENT */}
+        <motion.div
+          className="content-side"
+          animate={
+            inView
+              ? { opacity: 1, x: 0 }
+              : {
+                  opacity: 0,
+                  x: isReversed ? 30 : -30,
+                }
+          }
+          transition={{
+            duration: 0.65,
+            delay: service.delay + 0.15,
+          }}
+          style={{
+            flex: "0 0 48%",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: isReversed
+              ? "flex-end"
+              : "flex-start",
+            textAlign: isReversed ? "right" : "left",
+            paddingLeft: isReversed ? 8 : 32,
+            paddingRight: isReversed ? 32 : 8,
+          }}
+        >
+          <div
+            className="divider-line"
+            style={{
+              width: 42,
+              height: 3,
+              background:
+                "rgba(192,57,43,0.5)",
+              borderRadius: 2,
+              marginBottom: 14,
+              marginLeft: isReversed
+                ? "auto"
+                : 0,
+            }}
+          />
+
+          <p
+            className="service-description"
+            style={{
+              fontFamily:
+                "'DM Sans', sans-serif",
+              fontSize: 16,
+              color: "rgba(60,20,8,0.72)",
+              lineHeight: 1.8,
+              marginBottom: 16,
+              fontWeight: 500,
+            }}
+          >
+            {service.desc}
+          </p>
+
+          {/* CHIPS */}
+          <div
+            className="chips-wrap"
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              marginBottom: 16,
+              justifyContent: isReversed
+                ? "flex-end"
+                : "flex-start",
+            }}
+          >
+            {service.items.map((item, i) => (
+              <motion.span
+                key={item}
+                initial={{
+                  opacity: 0,
+                  scale: 0.85,
+                }}
+                animate={
+                  inView
+                    ? {
+                        opacity: 1,
+                        scale: 1,
+                      }
+                    : {}
+                }
+                transition={{
+                  duration: 0.3,
+                  delay:
+                    service.delay +
+                    0.3 +
+                    i * 0.07,
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color:
+                    "rgba(55,18,6,0.8)",
+                  background:
+                    "rgba(192,57,43,0.07)",
+                  border:
+                    "1px solid rgba(192,57,43,0.18)",
+                  borderRadius: 100,
+                  padding: "6px 14px",
+                }}
+              >
+                <span
+                  style={{
+                    color: "#C0392B",
+                    fontSize: 8,
+                  }}
+                >
+                  ▸
+                </span>
+
+                {item}
+              </motion.span>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
 
-/* ─── Section Header ────────────────────────────────────────── */
-function SectionHeader() {
-  const ref    = useRef(null);
-  const inView = useInView(ref, { once: true });
-
-  const fadeUp: Variants = {
-    hidden:  { opacity: 0, y: 22 },
-    visible: {
-      opacity: 1, y: 0,
-      transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
-    },
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
-      initial="hidden"
-      animate={inView ? "visible" : "hidden"}
-      style={{ textAlign: "center", marginBottom: "5rem" }}
-    >
-      {/* Label row */}
-      <motion.div variants={fadeUp} style={{ display: "inline-flex", alignItems: "center", gap: 10, marginBottom: "1.5rem" }}>
-        <motion.div
-          initial={{ scaleX: 0 }} animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.55, delay: 0.1 }}
-          style={{ width: 32, height: 2, background: `linear-gradient(90deg, ${T.red}, #e05040)`, borderRadius: 2, transformOrigin: "right" }}
-        />
-        <span style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: 11,
-          color: T.textMuted, letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500,
-        }}>What We Bring To You</span>
-        <span style={{
-          width: 5, height: 5, borderRadius: "50%",
-          background: T.red, display: "inline-block",
-          animation: "blink-dot 1.5s ease-in-out infinite",
-        }} />
-        <motion.div
-          initial={{ scaleX: 0 }} animate={inView ? { scaleX: 1 } : {}}
-          transition={{ duration: 0.55, delay: 0.1 }}
-          style={{ width: 32, height: 2, background: `linear-gradient(90deg, #e05040, ${T.red})`, borderRadius: 2, transformOrigin: "left" }}
-        />
-      </motion.div>
-
-      {/* Headline */}
-      <motion.h2 variants={fadeUp} style={{
-        fontFamily: "'Playfair Display', Georgia, serif",
-        fontSize: "clamp(30px, 5vw, 52px)", fontWeight: 700, color: T.textH,
-        margin: "0 0 1rem", letterSpacing: "-0.02em", lineHeight: 1.1,
-      }}>
-        Services Built{" "}
-        <motion.em
-          animate={{ opacity: [0.35, 0.68, 0.35] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-          style={{ fontStyle: "italic", color: "rgba(192,57,43,0.55)" }}
-        >with Heart</motion.em>
-      </motion.h2>
-
-      {/* Subtext */}
-      <motion.p variants={fadeUp} style={{
-        fontFamily: "'DM Sans', sans-serif", fontSize: 16,
-        color: "rgba(80,20,10,0.55)", maxWidth: 480, margin: "0 auto",
-        lineHeight: 1.75, fontWeight: 300,
-      }}>
-        Everything we offer is crafted with care, creativity, and a genuine passion for making a difference.
-      </motion.p>
-
-      {/* ── Transparent red glass count badge ─────────────────── */}
-      <motion.div
-        variants={fadeUp}
-        style={{
-          display: "inline-flex", alignItems: "center", gap: 10,
-          marginTop: "1.75rem",
-          background: T.redGlass,
-          backdropFilter: "blur(18px)",
-          border: `1px solid ${T.redBorder}`,
-          borderRadius: 100, padding: "8px 22px",
-          boxShadow: "inset 0 1px 0 rgba(255,220,215,0.5), 0 4px 18px rgba(192,57,43,0.12)",
-          animation: "float-badge 3.5s ease-in-out infinite",
-        }}
-      >
-        <span style={{
-          fontFamily: "'Playfair Display', serif", fontSize: 22,
-          fontWeight: 800, color: T.red, lineHeight: 1,
-        }}>6</span>
-        <div style={{ width: 1, height: 18, background: "rgba(192,57,43,0.25)" }} />
-        <span style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: 11,
-          color: T.redDark, letterSpacing: "0.1em",
-          textTransform: "uppercase", fontWeight: 600,
-        }}>Core Services</span>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ─── Main ──────────────────────────────────────────────────── */
 export default function Services() {
   return (
     <>
       <style>{globalStyles}</style>
 
       <section
-        id="services"
-        className="srv-section"
+        className="services-section"
         style={{
-          padding: "110px 2rem",
-          position: "relative", overflow: "hidden",
-          /* Red + white-cream base */
-          background: T.bg,
+          background:
+            "linear-gradient(135deg,#fff8f6 0%,#fff2ee 40%,#ffe8e2 70%,#fff5f3 100%)",
+          padding: "100px 40px 80px",
+          position: "relative",
         }}
       >
-        {/* ── Background blobs — red-tinted ─────────────────── */}
-        <div style={{
-          position: "absolute", top: "-15%", right: "-10%",
-          width: "55vw", height: "55vw", borderRadius: "50%",
-          background: `radial-gradient(circle, ${T.blobA} 0%, rgba(220,80,60,0.08) 45%, transparent 70%)`,
-          filter: "blur(80px)", pointerEvents: "none",
-          animation: "blob-drift 12s ease-in-out infinite",
-        }} />
-        <div style={{
-          position: "absolute", bottom: "-12%", left: "-6%",
-          width: "50vw", height: "50vw", borderRadius: "50%",
-          background: `radial-gradient(circle, ${T.blobB} 0%, rgba(200,60,40,0.06) 52%, transparent 70%)`,
-          filter: "blur(70px)", pointerEvents: "none",
-          animation: "blob-drift 16s ease-in-out reverse infinite",
-        }} />
-        <div style={{
-          position: "absolute", top: "40%", left: "36%",
-          width: "36vw", height: "36vw", borderRadius: "50%",
-          background: `radial-gradient(circle, ${T.blobC} 0%, transparent 65%)`,
-          filter: "blur(60px)", pointerEvents: "none",
-        }} />
-
-        {/* Noise texture */}
-        <div style={{
-          position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0, opacity: 0.35,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
-          animation: "noise 0.4s steps(1) infinite",
-        }} />
-
-        <div style={{ maxWidth: 1200, margin: "0 auto", position: "relative", zIndex: 1 }}>
-          <SectionHeader />
-
-          <div
-            className="srv-grid"
-            style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1.5rem" }}
+        {/* HEADER */}
+        <div
+          style={{
+            textAlign: "center",
+            marginBottom: "5rem",
+          }}
+        >
+          <p
+            style={{
+              fontFamily:
+                "'DM Sans', sans-serif",
+              fontSize: 13,
+              color:
+                "rgba(120,40,25,0.6)",
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              fontWeight: 700,
+              marginBottom: 14,
+            }}
           >
-            {SERVICES.map((service, i) => (
-              <ServiceCard key={service.title} service={service} index={i} />
-            ))}
-          </div>
+            What We Bring To You
+          </p>
+
+          <h2
+            className="section-heading"
+            style={{
+              fontFamily:
+                "'Playfair Display', serif",
+              fontSize:
+                "clamp(38px,5vw,62px)",
+              fontWeight: 800,
+              color: "#2a0c06",
+              lineHeight: 1.1,
+              margin: "0 0 14px",
+            }}
+          >
+            Services Built{" "}
+            <em
+              style={{
+                fontStyle: "italic",
+                color:
+                  "rgba(192,57,43,0.55)",
+              }}
+            >
+              with Heart
+            </em>
+          </h2>
+
+          <p
+            className="section-subtitle"
+            style={{
+              fontFamily:
+                "'DM Sans', sans-serif",
+              fontSize: 18,
+              color:
+                "rgba(80,20,10,0.58)",
+              fontWeight: 500,
+              lineHeight: 1.8,
+              maxWidth: 520,
+              margin: "0 auto",
+            }}
+          >
+            Everything crafted with care,
+            creativity, and genuine passion.
+          </p>
+        </div>
+
+        {/* SERVICES */}
+        <div
+          className="services-container"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 110,
+            maxWidth: 920,
+            margin: "0 auto",
+            position: "relative",
+            zIndex: 1,
+          }}
+        >
+          {SERVICES.map((service, i) => (
+            <ServiceRow
+              key={service.title}
+              service={service}
+              index={i}
+            />
+          ))}
         </div>
       </section>
     </>
