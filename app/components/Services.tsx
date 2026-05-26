@@ -512,6 +512,7 @@ export default function Services() {
       <style>{globalStyles}</style>
 
       <section
+      id="services"
         className="services-section"
         style={{
           background:

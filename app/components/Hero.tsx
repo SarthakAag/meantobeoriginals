@@ -582,7 +582,7 @@ export default function Hero() {
                 }}
               >
                 <motion.a
-                  href="#services"
+                  href="/hamper"
                   className="hero-cta-primary"
                   whileTap={{ scale: 0.97 }}
                   style={{
@@ -598,7 +598,7 @@ export default function Hero() {
                     display: "inline-block",
                   }}
                 >
-                  Explore Our Services →
+                  Explore Our hampers →
                 </motion.a>
 
                 <motion.a
