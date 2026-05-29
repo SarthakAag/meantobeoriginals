@@ -137,19 +137,19 @@ export default function Contact() {
       icon: <FaInstagram />,
       label: "Instagram",
       value: "@meant.to.be_originals",
-      href: "https://instagram.com/meant.to.be_originals",
+      href: "https://www.instagram.com/meanttobe.originals?igsh=czd0c3RmeW1hZGNx",
     },
     {
       icon: <FaFacebookF />,
       label: "Facebook",
       value: "Meant To Be Originals",
-      href: "https://facebook.com/",
+      href: "https://www.facebook.com/people/Meant-to-be/61589726623889/",
     },
     {
       icon: <MdEmail />,
       label: "Email",
-      value: "meanttobe.orginals@gmail.com",
-      href: "mailto:meanttobe.orginals@gmail.com",
+      value: "meanttobe.originals@gmail.com",
+      href: "mailto:meanttobe.originals@gmail.com",
     },
   ];
 
