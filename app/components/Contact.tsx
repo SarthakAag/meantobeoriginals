@@ -137,7 +137,7 @@ export default function Contact() {
       icon: <FaInstagram />,
       label: "Instagram",
       value: "@meant.to.be_originals",
-      href: "https://www.instagram.com/meanttobe.originals?igsh=czd0c3RmeW1hZGNx",
+      href: "https://www.instagram.com/meanttobe.originals?igsh=MWF0azJ1bmpzazMxcw%3D%3D&utm_source=qr",
     },
     {
       icon: <FaFacebookF />,
