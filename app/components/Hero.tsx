@@ -582,24 +582,26 @@ export default function Hero() {
                 }}
               >
                 <motion.a
-                  href="/hamper"
-                  className="hero-cta-primary"
-                  whileTap={{ scale: 0.97 }}
-                  style={{
-                    background: "#C0392B",
-                    color: "#fff",
-                    padding: "15px 38px",
-                    borderRadius: "12px",
-                    textDecoration: "none",
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "15px",
-                    fontWeight: 500,
-                    letterSpacing: "0.05em",
-                    display: "inline-block",
-                  }}
-                >
-                  Explore Our hampers →
-                </motion.a>
+  href="https://hampers.meanttobeoriginals.com/"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="hero-cta-primary"
+  whileTap={{ scale: 0.97 }}
+  style={{
+    background: "#C0392B",
+    color: "#fff",
+    padding: "15px 38px",
+    borderRadius: "12px",
+    textDecoration: "none",
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "15px",
+    fontWeight: 500,
+    letterSpacing: "0.05em",
+    display: "inline-block",
+  }}
+>
+  Explore Our Hampers →
+</motion.a>
 
                 <motion.a
                   href="#about"

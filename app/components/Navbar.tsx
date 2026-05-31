@@ -8,10 +8,7 @@ const NAV_LINKS = [
   { label: "Home", href: "#home" },
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
-   {
-  label: "Hampers",
-  href: "https://hampers.meanttobeoriginals.com/",
-}
+  { label: "Hampers", href: "https://hampers.meanttobeoriginals.com/" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -403,10 +400,16 @@ style={{
                   delay: i * 0.06,
                   duration: 0.3,
                 }}
-                onClick={() => {
-                  setMenuOpen(false);
-                  setActiveLink(link.label);
-                }}
+               onClick={(e) => {
+  if (link.label === "Hampers") {
+    e.preventDefault();
+    window.location.href = "https://hampers.meanttobeoriginals.com/";
+    return;
+  }
+
+  setMenuOpen(false);
+  setActiveLink(link.label);
+}}
                 style={{
                   color:
                     activeLink === link.label
