@@ -87,6 +87,23 @@ const SERVICES = [
     ],
     delay: 0.5,
   },
+  {
+    image: "/images/community.jpg",
+    title: "Community living spaces",
+    imageWidth: 160,
+  imageHeight: 170,
+  imageTop: -20,
+    tagline: "Belong. Connect. Thrive.",
+    desc: "Community design for connections",
+    items: [
+      "Networking events",
+      "Community coliving",
+      "Premium living",
+      "Fully furnished accommodation",
+      "Better lifestyle",
+    ],
+    delay: 0.6,
+  },
 ];
 
 const globalStyles = `
@@ -236,6 +253,9 @@ function ServiceRow({
 
   const isReversed = index % 2 !== 0;
 
+  const isCommunity =
+    service.title === "Community living spaces";
+
   return (
     <div ref={ref}>
       <div
@@ -256,7 +276,7 @@ function ServiceRow({
           style={{
             flex: "0 0 52%",
             position: "relative",
-            paddingTop: 83,
+            paddingTop: isCommunity ? 180 : 160,
           }}
         >
           {/* IMAGE */}
@@ -277,16 +297,39 @@ function ServiceRow({
             }}
             style={{
               position: "absolute",
-              top: 0,
-              left: isReversed ? "auto" : 18,
-              right: isReversed ? 18 : "auto",
-              width: 190,
-              height: 200,
+
+              top: isCommunity ? -40 : 0,
+
+              left: isReversed
+                ? "auto"
+                : isCommunity
+                ? -80
+                : 18,
+
+              right: isReversed
+                ? isCommunity
+                  ? -80
+                  : 18
+                : "auto",
+
+              width: isCommunity ? 240 : 200,
+              height: isCommunity ? 260 : 220,
+
               zIndex: 20,
               borderRadius: 18,
               overflow: "hidden",
             }}
           >
+            <Image
+              src={service.image}
+              alt={service.title}
+              fill
+              style={{
+                objectFit: "cover",
+              }}
+            />
+          
+          
             <Image
               src={service.image}
               alt={service.title}

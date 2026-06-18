@@ -95,7 +95,23 @@ const services = [
   },
 ];
 
+// Time slots available for booking
+const timeSlots = [
+  "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
+  "12:00 PM", "12:30 PM", "02:00 PM", "02:30 PM",
+  "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM",
+  "05:00 PM", "05:30 PM",
+];
+
+// Get today's date string in YYYY-MM-DD for min attribute
+function getTodayStr() {
+  return new Date().toISOString().split("T")[0];
+}
+
 export default function Contact() {
+  const [activeTab, setActiveTab] = useState<"message" | "meet">("message");
+
+  // Contact form state
   const [form, setForm] = useState({
     name: "",
     mobile: "",
@@ -103,28 +119,42 @@ export default function Contact() {
     category: "",
     message: "",
   });
-
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const selectedService = services.find(
-    (s) => s.value === form.category
-  );
+  // Meet booking state
+  const [meetForm, setMeetForm] = useState({
+    name: "",
+    email: "",
+    mobile: "",
+    date: "",
+    time: "",
+    topic: "",
+  });
+  const [meetSubmitted, setMeetSubmitted] = useState(false);
+  const [meetLoading, setMeetLoading] = useState(false);
+
+  const selectedService = services.find((s) => s.value === form.category);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Listen for "Book a Meet" CTA click from Navbar
+  useEffect(() => {
+    function handleOpenMeetTab() {
+      setActiveTab("meet");
+    }
+    window.addEventListener("open-meet-tab", handleOpenMeetTab);
+    return () => window.removeEventListener("open-meet-tab", handleOpenMeetTab);
   }, []);
 
   const people = [
@@ -160,7 +190,7 @@ export default function Contact() {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ type: "message", ...form }),
       });
       const data = await response.json();
       if (data.success) {
@@ -174,6 +204,30 @@ export default function Contact() {
       alert("Server error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMeetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setMeetLoading(true);
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "meet", ...meetForm }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMeetSubmitted(true);
+        setMeetForm({ name: "", email: "", mobile: "", date: "", time: "", topic: "" });
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.log(error);
+      alert("Server error. Please try again.");
+    } finally {
+      setMeetLoading(false);
     }
   };
 
@@ -315,6 +369,58 @@ export default function Contact() {
           backdrop-filter: blur(20px);
         }
 
+        /* ── Tab Toggle ─────────────────────────────────── */
+        .tab-toggle {
+          display: flex;
+          gap: 0;
+          background: linear-gradient(135deg, rgba(248,233,219,0.7), rgba(255,248,243,0.7));
+          border: 1px solid rgba(184,58,47,0.10);
+          border-radius: 20px;
+          padding: 5px;
+          margin-bottom: 32px;
+          width: fit-content;
+        }
+
+        .tab-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 22px;
+          border: none;
+          border-radius: 15px;
+          font-family: 'Outfit', sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          color: var(--ink-soft);
+          background: transparent;
+          white-space: nowrap;
+        }
+
+        .tab-btn svg {
+          width: 15px;
+          height: 15px;
+          stroke: currentColor;
+          fill: none;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+          flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+          background: linear-gradient(135deg, var(--red), var(--red-deep));
+          color: white;
+          box-shadow: 0 8px 20px rgba(184,58,47,0.22);
+        }
+
+        .tab-btn:not(.active):hover {
+          color: var(--red);
+          background: rgba(184,58,47,0.06);
+        }
+
+        /* ── Form shared ─────────────────────────────────── */
         .form-title {
           font-family: 'Cormorant Garamond', serif;
           font-size: 40px;
@@ -354,7 +460,7 @@ export default function Contact() {
           font-weight: 700;
         }
 
-        .field-input, .field-textarea {
+        .field-input, .field-textarea, .field-select {
           border: 1px solid rgba(184,58,47,0.12);
           border-radius: 18px;
           padding: 16px 18px;
@@ -367,7 +473,7 @@ export default function Contact() {
           box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 10px 24px rgba(184,58,47,0.03);
         }
 
-        .field-input:focus, .field-textarea:focus {
+        .field-input:focus, .field-textarea:focus, .field-select:focus {
           border-color: var(--gold);
           box-shadow: 0 0 0 4px rgba(201,145,61,0.10), 0 18px 40px rgba(184,58,47,0.06);
         }
@@ -375,6 +481,60 @@ export default function Contact() {
         .field-textarea {
           resize: vertical;
           min-height: 130px;
+        }
+
+        .field-select {
+          appearance: none;
+          -webkit-appearance: none;
+          cursor: pointer;
+          background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23B83A2F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 16px center;
+          padding-right: 44px;
+        }
+
+        .field-select option {
+          background: #FFF8F3;
+          color: #5A2D24;
+        }
+
+        /* ── Date picker styling ─────────────────────────── */
+        .field-input[type="date"] {
+          color-scheme: light;
+        }
+
+        /* ── Time slots grid ─────────────────────────────── */
+        .time-slots-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 8px;
+        }
+
+        .time-slot {
+          padding: 9px 6px;
+          border: 1px solid rgba(184,58,47,0.14);
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(248,237,228,0.96));
+          font-size: 13px;
+          font-family: 'Outfit', sans-serif;
+          color: var(--ink-soft);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: center;
+          font-weight: 500;
+        }
+
+        .time-slot:hover {
+          border-color: rgba(184,58,47,0.30);
+          color: var(--red);
+          background: rgba(184,58,47,0.04);
+        }
+
+        .time-slot.selected {
+          background: linear-gradient(135deg, var(--red), var(--red-deep));
+          color: white;
+          border-color: transparent;
+          box-shadow: 0 6px 16px rgba(184,58,47,0.22);
         }
 
         /* ── Custom Dropdown ─────────────────────────────── */
@@ -499,9 +659,7 @@ export default function Contact() {
         }
 
         .dropdown-option:last-child { border-bottom: none; }
-
         .dropdown-option:hover { background: rgba(184,58,47,0.04); }
-
         .dropdown-option.selected { background: rgba(201,145,61,0.07); }
 
         .opt-icon-wrap {
@@ -577,9 +735,62 @@ export default function Contact() {
 
         .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
+        /* ── Meet booking notice ─────────────────────────── */
+        .meet-notice {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          background: linear-gradient(135deg, rgba(201,145,61,0.08), rgba(201,145,61,0.04));
+          border: 1px solid rgba(201,145,61,0.20);
+          border-radius: 16px;
+          padding: 14px 16px;
+          margin-bottom: 4px;
+        }
+
+        .meet-notice-icon {
+          color: var(--gold);
+          flex-shrink: 0;
+          margin-top: 1px;
+        }
+
+        .meet-notice-icon svg {
+          width: 16px;
+          height: 16px;
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 2;
+          stroke-linecap: round;
+          stroke-linejoin: round;
+        }
+
+        .meet-notice-text {
+          font-size: 13px;
+          color: var(--ink-soft);
+          line-height: 1.6;
+        }
+
+        .meet-notice-text strong {
+          color: #92400E;
+          font-weight: 600;
+        }
+
+        /* ── Success state ───────────────────────────────── */
         .success-state {
           text-align: center;
           padding: 50px 20px;
+        }
+
+        .success-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, rgba(201,145,61,0.12), rgba(201,145,61,0.06));
+          border: 1px solid rgba(201,145,61,0.20);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 20px;
+          font-size: 26px;
         }
 
         .success-title {
@@ -589,6 +800,15 @@ export default function Contact() {
           color: var(--ink);
         }
 
+        .success-sub {
+          color: var(--ink-soft);
+          font-size: 15px;
+          line-height: 1.8;
+          max-width: 340px;
+          margin: 0 auto;
+        }
+
+        /* ── Responsive ──────────────────────────────────── */
         @media (max-width: 920px) {
           .contact-grid { grid-template-columns: 1fr; }
         }
@@ -598,6 +818,9 @@ export default function Contact() {
           .form-card { padding: 28px; }
           .contact-section { padding: 90px 18px 70px; }
           .contact-title { font-size: 52px; }
+          .time-slots-grid { grid-template-columns: repeat(3, 1fr); }
+          .tab-toggle { width: 100%; }
+          .tab-btn { flex: 1; justify-content: center; padding: 10px 12px; font-size: 13px; }
         }
       `}</style>
 
@@ -645,180 +868,309 @@ export default function Contact() {
             ))}
           </div>
 
-          {/* FORM */}
+          {/* FORM CARD */}
           <div className="form-card">
-            {submitted ? (
-              <div className="success-state">
-                <h3 className="success-title">Message Sent!</h3>
-                <p>Thank you for reaching out. We'll get back to you shortly.</p>
-              </div>
-            ) : (
+
+            {/* Tab Toggle */}
+            <div className="tab-toggle">
+              <button
+                type="button"
+                className={`tab-btn${activeTab === "message" ? " active" : ""}`}
+                onClick={() => setActiveTab("message")}
+              >
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Send a Message
+              </button>
+              <button
+                type="button"
+                className={`tab-btn${activeTab === "meet" ? " active" : ""}`}
+                onClick={() => setActiveTab("meet")}
+              >
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="16" y1="2" x2="16" y2="6"/>
+                  <line x1="8" y1="2" x2="8" y2="6"/>
+                  <line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                Book a Meet
+              </button>
+            </div>
+
+            {/* ── MESSAGE FORM ── */}
+            {activeTab === "message" && (
               <>
-                <h3 className="form-title">Send us a message</h3>
-                <p className="form-tagline">We typically respond within 24 hours.</p>
-
-                <form onSubmit={handleSubmit} className="form-inner">
-                  <div className="field-row">
-                    <div className="field-group">
-                      <label className="field-label">Your Name</label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="Rahul Sharma"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="field-input"
-                      />
-                    </div>
-                    <div className="field-group">
-                      <label className="field-label">Mobile Number</label>
-                      <input
-                        type="tel"
-                        required
-                        placeholder="+91 8390220930"
-                        value={form.mobile}
-                        onChange={(e) => setForm({ ...form, mobile: e.target.value })}
-                        className="field-input"
-                      />
-                    </div>
+                {submitted ? (
+                  <div className="success-state">
+                    <div className="success-icon">✦</div>
+                    <h3 className="success-title">Message Sent!</h3>
+                    <p className="success-sub">Thank you for reaching out. We'll get back to you within 24 hours.</p>
                   </div>
+                ) : (
+                  <>
+                    <h3 className="form-title">Send us a message</h3>
+                    <p className="form-tagline">We typically respond within 24 hours.</p>
 
-                  <div className="field-row">
-                    <div className="field-group">
-                      <label className="field-label">Email Address</label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="abc@gmail.com"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="field-input"
-                      />
-                    </div>
+                    <form onSubmit={handleSubmit} className="form-inner">
+                      <div className="field-row">
+                        <div className="field-group">
+                          <label className="field-label">Your Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Rahul Sharma"
+                            value={form.name}
+                            onChange={(e) => setForm({ ...form, name: e.target.value })}
+                            className="field-input"
+                          />
+                        </div>
+                        <div className="field-group">
+                          <label className="field-label">Mobile Number</label>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="+91 8390220930"
+                            value={form.mobile}
+                            onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+                            className="field-input"
+                          />
+                        </div>
+                      </div>
 
-                    {/* ── Custom Dropdown ── */}
-                    <div className="field-group">
-                      <label className="field-label">Category</label>
-                      <div className="custom-dropdown" ref={dropdownRef}>
-                        {/* Hidden native input for form validation */}
+                      <div className="field-row">
+                        <div className="field-group">
+                          <label className="field-label">Email Address</label>
+                          <input
+                            type="email"
+                            required
+                            placeholder="abc@gmail.com"
+                            value={form.email}
+                            onChange={(e) => setForm({ ...form, email: e.target.value })}
+                            className="field-input"
+                          />
+                        </div>
+
+                        {/* Custom Dropdown */}
+                        <div className="field-group">
+                          <label className="field-label">Category</label>
+                          <div className="custom-dropdown" ref={dropdownRef}>
+                            <input
+                              type="text"
+                              required
+                              value={form.category}
+                              onChange={() => {}}
+                              style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
+                              tabIndex={-1}
+                            />
+                            <div
+                              className={`dropdown-trigger${dropdownOpen ? " open" : ""}`}
+                              onClick={() => setDropdownOpen((o) => !o)}
+                              role="combobox"
+                              aria-expanded={dropdownOpen}
+                              aria-haspopup="listbox"
+                              tabIndex={0}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") setDropdownOpen((o) => !o);
+                                if (e.key === "Escape") setDropdownOpen(false);
+                              }}
+                            >
+                              <div
+                                className="trigger-svc-icon"
+                                style={{
+                                  background: selectedService
+                                    ? selectedService.iconBgActive
+                                    : "linear-gradient(135deg,#FDEFE4,#F7DDCC)",
+                                  color: selectedService ? "#fff" : "var(--red)",
+                                }}
+                              >
+                                {selectedService ? (
+                                  <span style={{ display: "flex" }}>{selectedService.svgIcon}</span>
+                                ) : (
+                                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                  </svg>
+                                )}
+                              </div>
+                              <span className={`trigger-svc-label${selectedService ? "" : " placeholder"}`}>
+                                {selectedService ? selectedService.value : "Choose a Service"}
+                              </span>
+                            </div>
+
+                            <span className={`dropdown-arrow${dropdownOpen ? " open" : ""}`}>
+                              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                            </span>
+
+                            <div className={`dropdown-panel${dropdownOpen ? " open" : ""}`} role="listbox">
+                              {services.map((svc) => (
+                                <div
+                                  key={svc.value}
+                                  className={`dropdown-option${form.category === svc.value ? " selected" : ""}`}
+                                  role="option"
+                                  aria-selected={form.category === svc.value}
+                                  onClick={() => {
+                                    setForm({ ...form, category: svc.value });
+                                    setDropdownOpen(false);
+                                  }}
+                                >
+                                  <div
+                                    className="opt-icon-wrap"
+                                    style={{
+                                      background: form.category === svc.value ? svc.iconBgActive : svc.iconBg,
+                                      color: form.category === svc.value ? "#fff" : svc.iconColor,
+                                    }}
+                                  >
+                                    {svc.svgIcon}
+                                  </div>
+                                  <div className="opt-text">
+                                    <div className="opt-name">{svc.value}</div>
+                                    <div className="opt-desc">{svc.desc}</div>
+                                  </div>
+                                  <span className="opt-check">✦</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="field-group">
+                        <label className="field-label">Your Message</label>
+                        <textarea
+                          required
+                          placeholder="Tell us about your requirements..."
+                          rows={5}
+                          value={form.message}
+                          onChange={(e) => setForm({ ...form, message: e.target.value })}
+                          className="field-textarea"
+                        />
+                      </div>
+
+                      <button type="submit" className="submit-btn" disabled={loading}>
+                        {loading ? "Sending..." : "Send Message →"}
+                      </button>
+                    </form>
+                  </>
+                )}
+              </>
+            )}
+
+            {/* ── BOOK A MEET FORM ── */}
+            {activeTab === "meet" && (
+              <>
+                {meetSubmitted ? (
+                  <div className="success-state">
+                    <div className="success-icon">📅</div>
+                    <h3 className="success-title">Meet Requested!</h3>
+                    <p className="success-sub">
+                      We've received your booking request and will send a confirmation to your email shortly.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <h3 className="form-title">Book a Meeting</h3>
+                    <p className="form-tagline">Pick a date & time and we'll confirm via email.</p>
+
+                
+
+                    <form onSubmit={handleMeetSubmit} className="form-inner" style={{ marginTop: "20px" }}>
+                      <div className="field-row">
+                        <div className="field-group">
+                          <label className="field-label">Your Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Rahul Sharma"
+                            value={meetForm.name}
+                            onChange={(e) => setMeetForm({ ...meetForm, name: e.target.value })}
+                            className="field-input"
+                          />
+                        </div>
+                        <div className="field-group">
+                          <label className="field-label">Mobile Number</label>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="+91 8390220930"
+                            value={meetForm.mobile}
+                            onChange={(e) => setMeetForm({ ...meetForm, mobile: e.target.value })}
+                            className="field-input"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="field-group">
+                        <label className="field-label">Email Address</label>
+                        <input
+                          type="email"
+                          required
+                          placeholder="abc@gmail.com"
+                          value={meetForm.email}
+                          onChange={(e) => setMeetForm({ ...meetForm, email: e.target.value })}
+                          className="field-input"
+                        />
+                      </div>
+
+                      <div className="field-group">
+                        <label className="field-label">Preferred Date</label>
+                        <input
+                          type="date"
+                          required
+                          min={getTodayStr()}
+                          value={meetForm.date}
+                          onChange={(e) => setMeetForm({ ...meetForm, date: e.target.value })}
+                          className="field-input"
+                        />
+                      </div>
+
+                      <div className="field-group">
+                        <label className="field-label">Preferred Time</label>
+                        <div className="time-slots-grid">
+                          {timeSlots.map((slot) => (
+                            <button
+                              key={slot}
+                              type="button"
+                              className={`time-slot${meetForm.time === slot ? " selected" : ""}`}
+                              onClick={() => setMeetForm({ ...meetForm, time: slot })}
+                            >
+                              {slot}
+                            </button>
+                          ))}
+                        </div>
+                        {/* Hidden input for form validation */}
                         <input
                           type="text"
                           required
-                          value={form.category}
+                          value={meetForm.time}
                           onChange={() => {}}
                           style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 0, height: 0 }}
                           tabIndex={-1}
                         />
-
-                        <div
-                          className={`dropdown-trigger${dropdownOpen ? " open" : ""}`}
-                          onClick={() => setDropdownOpen((o) => !o)}
-                          role="combobox"
-                          aria-expanded={dropdownOpen}
-                          aria-haspopup="listbox"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter" || e.key === " ") setDropdownOpen((o) => !o);
-                            if (e.key === "Escape") setDropdownOpen(false);
-                          }}
-                        >
-                          {/* Trigger icon */}
-                          <div
-                            className="trigger-svc-icon"
-                            style={{
-                              background: selectedService
-                                ? selectedService.iconBgActive
-                                : "linear-gradient(135deg,#FDEFE4,#F7DDCC)",
-                              color: selectedService ? "#fff" : "var(--red)",
-                            }}
-                          >
-                            {selectedService ? (
-                              <span style={{ display: "flex" }}>
-                                {selectedService.svgIcon}
-                              </span>
-                            ) : (
-                              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
-                                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-                              </svg>
-                            )}
-                          </div>
-
-                          <span className={`trigger-svc-label${selectedService ? "" : " placeholder"}`}>
-                            {selectedService ? selectedService.value : "Choose a Service"}
-                          </span>
-                        </div>
-
-                        {/* Arrow badge */}
-                        <span className={`dropdown-arrow${dropdownOpen ? " open" : ""}`}>
-                          <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-                        </span>
-
-                        {/* Panel */}
-                        <div
-                          className={`dropdown-panel${dropdownOpen ? " open" : ""}`}
-                          role="listbox"
-                        >
-                          {services.map((svc) => (
-                            <div
-                              key={svc.value}
-                              className={`dropdown-option${form.category === svc.value ? " selected" : ""}`}
-                              role="option"
-                              aria-selected={form.category === svc.value}
-                              onClick={() => {
-                                setForm({ ...form, category: svc.value });
-                                setDropdownOpen(false);
-                              }}
-                            >
-                              <div
-                                className="opt-icon-wrap"
-                                style={{
-                                  background:
-                                    form.category === svc.value
-                                      ? svc.iconBgActive
-                                      : svc.iconBg,
-                                  color:
-                                    form.category === svc.value
-                                      ? "#fff"
-                                      : svc.iconColor,
-                                }}
-                              >
-                                {svc.svgIcon}
-                              </div>
-                              <div className="opt-text">
-                                <div className="opt-name">{svc.value}</div>
-                                <div className="opt-desc">{svc.desc}</div>
-                              </div>
-                              <span className="opt-check">✦</span>
-                            </div>
-                          ))}
-                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="field-group">
-                    <label className="field-label">Your Message</label>
-                    <textarea
-                      required
-                      placeholder="Tell us about your requirements..."
-                      rows={5}
-                      value={form.message}
-                      onChange={(e) => setForm({ ...form, message: e.target.value })}
-                      className="field-textarea"
-                    />
-                  </div>
+                      <div className="field-group">
+                        <label className="field-label">What would you like to discuss?</label>
+                        <textarea
+                          required
+                          placeholder="Brief description of the topic or service you want to discuss..."
+                          rows={3}
+                          value={meetForm.topic}
+                          onChange={(e) => setMeetForm({ ...meetForm, topic: e.target.value })}
+                          className="field-textarea"
+                          style={{ minHeight: "90px" }}
+                        />
+                      </div>
 
-                  <button
-                    type="submit"
-                    className="submit-btn"
-                    disabled={loading}
-                  >
-                    {loading ? "Sending..." : "Send Message →"}
-                  </button>
-                </form>
+                      <button type="submit" className="submit-btn" disabled={meetLoading}>
+                        {meetLoading ? "Booking..." : "Request Meeting →"}
+                      </button>
+                    </form>
+                  </>
+                )}
               </>
             )}
+
           </div>
         </div>
       </section>
